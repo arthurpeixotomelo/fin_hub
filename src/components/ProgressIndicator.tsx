@@ -1,0 +1,47 @@
+import type { ReactNode } from "react";
+
+interface ProcessingState {
+    status: "idle" | "processing" | "validated" | "error" | "ready";
+    progress: number;
+    message: string;
+    stage?: string;
+    currentSheet?: string;
+}
+
+interface ProgressIndicatorProps {
+    processing: ProcessingState;
+}
+
+export default function ProgressIndicator(
+    { processing }: ProgressIndicatorProps,
+): ReactNode {
+    if (processing.status === "idle") {
+        return null;
+    }
+
+    return (
+        <div className="processingSection">
+            <div className="progressBar">
+                <div
+                    className="progressFill"
+                    style={{ width: `${processing.progress}%` }}
+                />
+            </div>
+            <div className="processingInfo">
+                <p className="processingMessage">
+                    {processing.message}
+                </p>
+                {processing.stage && (
+                    <p className="processingStage">
+                        Etapa: {processing.stage}
+                        {processing.currentSheet &&
+                            ` (${processing.currentSheet})`}
+                    </p>
+                )}
+                <p className="processingProgress">
+                    {processing.progress}% concluído
+                </p>
+            </div>
+        </div>
+    );
+}
