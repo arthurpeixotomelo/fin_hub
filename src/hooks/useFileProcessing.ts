@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
+import { validateFileType } from "../utils/validation.ts";
 import type {
+    FileProcessingHookResult,
     FinancialData,
     ProcessingProgress,
     ProcessingResult,
@@ -8,21 +10,10 @@ import type {
     UnpivotedData,
     ValidationResult,
     WorkerMessage,
-    WorkerResponse
+    WorkerResponse,
 } from "../utils/types.ts";
 
-interface FileProcessingHookResult {
-    file: File | null;
-    rawData: Map<string, FinancialData[]>;
-    unpivotedData: UnpivotedData[];
-    monthColumns: string[];
-    validation: ValidationResult;
-    processing: ProcessingState;
-    fileInputRef: React.RefObject<HTMLInputElement>;
-    handleFileChange: (e: ChangeEvent<HTMLInputElement>) => Promise<void>;
-    handleSubmit: () => void;
-    resetForm: () => void;
-}
+
 
 export default function useFileProcessing(): FileProcessingHookResult {
     const [file, setFile] = useState<File | null>(null);
@@ -41,75 +32,80 @@ export default function useFileProcessing(): FileProcessingHookResult {
         progress: 0,
         message: "",
     });
-    
+
     const fileInputRef = useRef<HTMLInputElement>(null);
     const workerRef = useRef<Worker | null>(null);
 
     useEffect(() => {
-        // Create a new worker instance
         workerRef.current = new Worker(
-            new URL('../workers/fileProcessor.worker.ts', import.meta.url),
-            { type: 'module' }
+            new URL("../workers/fileProcessor.worker.ts", import.meta.url),
+            { type: "module" },
         );
-        
-        // Make sure workerRef.current is not null before accessing it
+
         if (workerRef.current) {
-            workerRef.current.onmessage = (event: MessageEvent<WorkerResponse>) => {
+            workerRef.current.onmessage = (
+                event: MessageEvent<WorkerResponse>,
+            ) => {
                 const { type, data } = event.data;
 
-            if (type === "progress" && "progress" in data && "message" in data) {
-                const progressData = data as ProcessingProgress;
-                setProcessing({
-                    status: "processing",
-                    progress: progressData.progress,
-                    message: progressData.message,
-                    stage: progressData.stage,
-                    currentSheet: progressData.sheetName,
-                });
-            } else if (type === "complete" && "success" in data) {
-                const result = data as ProcessingResult;
-
-                if (result.success) {
-                    setRawData(result.rawData);
-                    setUnpivotedData(result.unpivotedData);
-                    setValidation(result.validation);
-                    setMonthColumns(result.monthColumns);
-
+                if (
+                    type === "progress" && "progress" in data &&
+                    "message" in data
+                ) {
+                    const progressData = data as ProcessingProgress;
                     setProcessing({
-                        status: result.validation.isValid
-                            ? "validated"
-                            : "error",
-                        progress: 100,
-                        message: result.validation.isValid
-                            ? "Arquivo processado com sucesso!"
-                            : "Arquivo processado com erros de validação",
+                        status: "processing",
+                        progress: progressData.progress,
+                        message: progressData.message,
+                        stage: progressData.stage,
+                        currentSheet: progressData.sheetName,
                     });
-                } else {
+                } else if (type === "complete" && "success" in data) {
+                    const result = data as ProcessingResult;
+
+                    if (result.success) {
+                        setRawData(result.rawData);
+                        setUnpivotedData(result.unpivotedData);
+                        setValidation(result.validation);
+                        setMonthColumns(result.monthColumns);
+
+                        setProcessing({
+                            status: result.validation.isValid
+                                ? "validated"
+                                : "error",
+                            progress: 100,
+                            message: result.validation.isValid
+                                ? "Arquivo processado com sucesso!"
+                                : "Arquivo processado com erros de validação",
+                        });
+                    } else {
+                        setProcessing({
+                            status: "error",
+                            progress: 0,
+                            message: result.error ||
+                                "Erro durante o processamento",
+                        });
+                        setValidation({
+                            isValid: false,
+                            errors: [result.error || "Erro desconhecido"],
+                            warnings: [],
+                        });
+                    }
+                } else if (type === "error" && "error" in data) {
+                    const errorData = data as { error: string };
                     setProcessing({
                         status: "error",
                         progress: 0,
-                        message: result.error || "Erro durante o processamento",
+                        message: errorData.error,
                     });
                     setValidation({
                         isValid: false,
-                        errors: [result.error || "Erro desconhecido"],
+                        errors: [errorData.error],
                         warnings: [],
                     });
                 }
-            } else if (type === "error" && "error" in data) {
-                const errorData = data as { error: string };
-                setProcessing({
-                    status: "error",
-                    progress: 0,
-                    message: errorData.error,
-                });
-                setValidation({
-                    isValid: false,
-                    errors: [errorData.error],
-                    warnings: [],
-                });
-            }
-        };
+            };
+        }
 
         return () => {
             workerRef.current?.terminate();
@@ -119,14 +115,16 @@ export default function useFileProcessing(): FileProcessingHookResult {
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (!selectedFile) return;
-        if (!selectedFile.name.endsWith(".xlsx")) {
+
+        if (!validateFileType(selectedFile)) {
             setValidation({
                 isValid: false,
-                errors: ["Por favor, selecione um arquivo .xlsx"],
+                errors: ["Por favor, selecione um arquivo .xlsx válido"],
                 warnings: [],
             });
             return;
         }
+
         setFile(selectedFile);
         setRawData(new Map());
         setUnpivotedData([]);
@@ -193,13 +191,10 @@ export default function useFileProcessing(): FileProcessingHookResult {
         setMonthColumns([]);
         setValidation({ isValid: false, errors: [], warnings: [] });
         setProcessing({ status: "idle", progress: 0, message: "" });
-        
-        // Reset the file input element
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     };
-
     return {
         file,
         rawData,
@@ -210,6 +205,6 @@ export default function useFileProcessing(): FileProcessingHookResult {
         fileInputRef,
         handleFileChange,
         handleSubmit,
-        resetForm
+        resetForm,
     };
 }

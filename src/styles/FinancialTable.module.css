@@ -1,0 +1,375 @@
+/* Enhanced Financial Table Styles */
+
+.financialTableContainer {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.tableControls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.groupingSelector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.groupingSelector label {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.groupingSelector select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 0.875rem;
+    color: #374151;
+    cursor: pointer;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.groupingSelector select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.calculationsToggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.calculationsToggle label {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.calculationsToggle input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #3b82f6;
+    cursor: pointer;
+}
+
+.tableWrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.financialTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+    background: white;
+}
+
+.tableHeader {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+    padding: 0.875rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    user-select: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    z-index: 10;
+}
+
+.tableHeader:hover {
+    background: #f1f5f9;
+}
+
+.tableHeader.sortable {
+    position: relative;
+}
+
+.tableHeader.sortable::after {
+    content: "";
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border: 4px solid transparent;
+    opacity: 0.3;
+}
+
+.tableHeader.sorted.asc::after {
+    border-bottom-color: #6b7280;
+    opacity: 1;
+}
+
+.tableHeader.sorted.desc::after {
+    border-top-color: #6b7280;
+    opacity: 1;
+}
+
+.tableHeaderGroup {
+    background: #f1f5f9;
+    border-bottom: 1px solid #d1d5db;
+    font-weight: 700;
+    color: #1f2937;
+    text-align: center;
+}
+
+.metadataColumn {
+    background: #fafbfc;
+    border-right: 2px solid #e2e8f0;
+}
+
+.monthColumn {
+    text-align: right;
+    min-width: 100px;
+}
+
+.calculationColumn {
+    background: #fef3e2;
+    color: #92400e;
+    text-align: right;
+    min-width: 100px;
+}
+
+.tableCell {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.tableRow {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.tableRow:hover {
+    background: #f9fafb;
+}
+
+.tableRow.groupRow {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+}
+
+.tableRow.groupRow:hover {
+    background: #f1f5f9;
+}
+
+.currencyCell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: #111827;
+}
+
+.currencyCell.positive {
+    color: #059669;
+}
+
+.currencyCell.negative {
+    color: #dc2626;
+}
+
+.percentageCell {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.percentageCell.positive {
+    color: #059669;
+}
+
+.percentageCell.negative {
+    color: #dc2626;
+}
+
+.percentageCell.positive::before {
+    content: "+";
+}
+
+.emptyCell {
+    color: #9ca3af;
+    font-style: italic;
+    text-align: center;
+}
+
+.groupToggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.groupToggle:hover {
+    background: #e5e7eb;
+}
+
+.groupToggle::before {
+    content: "▶";
+    font-size: 0.75rem;
+    color: #6b7280;
+    transition: transform 0.2s ease-in-out;
+}
+
+.groupToggle.expanded::before {
+    transform: rotate(90deg);
+}
+
+.tableSummary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.tableSummary .summaryInfo {
+    display: flex;
+    gap: 1rem;
+}
+
+.tableSummary .summaryItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.tableSummary .summaryItem .label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.tableSummary .summaryItem .value {
+    font-weight: 600;
+    color: #111827;
+}
+
+.loadingState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+.emptyState .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.emptyState .message {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.emptyState .description {
+    font-size: 0.875rem;
+    max-width: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .financialTableContainer {
+        padding: 1rem;
+    }
+
+    .tableControls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .financialTable {
+        min-width: 800px;
+    }
+}
+
+@media (max-width: 768px) {
+    .financialTableContainer {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .tableHeader,
+    .tableCell {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .financialTable {
+        min-width: 600px;
+    }
+
+    .tableSummary {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .tableSummary .summaryInfo {
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 480px) {
+    .tableWrapper {
+        border-radius: 4px;
+    }
+
+    .tableHeader,
+    .tableCell {
+        padding: 0.375rem;
+        font-size: 0.75rem;
+    }
+
+    .groupingSelector,
+    .calculationsToggle {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.25rem;
+    }
+}

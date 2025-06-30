@@ -8,24 +8,19 @@ import type {
     WorkerProgressResponse,
     WorkerResponse,
 } from "../utils/types.ts";
+import { REQUIRED_COLUMNS, REQUIRED_SHEETS } from "../utils/types.ts";
 import {
     detectMonthColumns,
+    getDefaultDateConfig,
     normalizeMonthColumn,
-    REQUIRED_COLUMNS,
-    REQUIRED_SHEETS,
     validateDataTypes,
     validateRequiredColumns,
 } from "../utils/validation.ts";
-import {
-    defaultBusinessConfig,
-    validateBusinessRules,
-} from "../utils/businessValidation.ts";
 
 const processFile = (
     file: ArrayBuffer,
     _fileName: string,
 ): ProcessingResult => {
-    console.log("Processing file...");
     try {
         self.postMessage({
             type: "progress",
@@ -35,7 +30,6 @@ const processFile = (
                 message: "Lendo arquivo Excel...",
             },
         } as WorkerProgressResponse);
-        console.log("Reading file...");
         const workbook = read(file);
         self.postMessage({
             type: "progress",
@@ -97,10 +91,11 @@ const processFile = (
             }
 
             if (i === 0) {
-                monthColumns = detectMonthColumns(jsonData);
+                const dateConfig = getDefaultDateConfig();
+                monthColumns = detectMonthColumns(jsonData[0], dateConfig);
                 if (monthColumns.length === 0) {
                     throw new Error(
-                        "Nenhuma coluna de mês encontrada no formato esperado",
+                        "Nenhuma coluna de mês encontrada no formato esperado para o ano 2025",
                     );
                 }
             }
@@ -116,9 +111,11 @@ const processFile = (
             } as WorkerProgressResponse);
 
             const requiredColumns = [...REQUIRED_COLUMNS, ...monthColumns];
+            const dateConfig = getDefaultDateConfig();
             const structureValidation = validateRequiredColumns(
                 jsonData,
                 requiredColumns,
+                dateConfig,
             );
 
             if (!structureValidation.isValid) {
@@ -171,52 +168,6 @@ const processFile = (
         self.postMessage({
             type: "progress",
             data: {
-                stage: "validating_business",
-                progress: 80,
-                message: "Validando regras de negócio...",
-            },
-        } as WorkerProgressResponse);
-
-        for (const [sheetName, sheetData] of allSheetsData) {
-            const businessValidation = validateBusinessRules(
-                sheetData,
-                monthColumns,
-                defaultBusinessConfig,
-            );
-
-            if (!businessValidation.isValid) {
-                businessValidation.errors = businessValidation.errors.map(
-                    (error) => `${sheetName}: ${error}`,
-                );
-                totalValidation.errors.push(...businessValidation.errors);
-                totalValidation.isValid = false;
-            }
-            totalValidation.warnings.push(
-                ...businessValidation.warnings.map((warning) =>
-                    `${sheetName}: ${warning}`
-                ),
-            );
-        }
-
-        self.postMessage({
-            type: "progress",
-            data: {
-                stage: "cross_validating",
-                progress: 85,
-                message: "Validando consistência entre planilhas...",
-            },
-        } as WorkerProgressResponse);
-
-        // const crossValidation = validateCrossSheet(allSheetsData, monthColumns);
-        // totalValidation.warnings.push(...crossValidation.warnings);
-        // if (!crossValidation.isValid) {
-        //     totalValidation.errors.push(...crossValidation.errors);
-        //     totalValidation.isValid = false;
-        // }
-
-        self.postMessage({
-            type: "progress",
-            data: {
                 stage: "transforming",
                 progress: 90,
                 message: "Transformando dados...",
@@ -226,11 +177,15 @@ const processFile = (
         const unpivotedData: UnpivotedData[] = [];
 
         for (const [sheetName, sheetData] of allSheetsData) {
+            const dateConfig = getDefaultDateConfig();
             sheetData.forEach((row) => {
                 monthColumns.forEach((month) => {
                     const value = row[month];
                     if (typeof value === "number" && !isNaN(value)) {
-                        const normalizedMonth = normalizeMonthColumn(month);
+                        const normalizedMonth = normalizeMonthColumn(
+                            month,
+                            dateConfig,
+                        );
                         // Only add if we have a valid month format
                         if (normalizedMonth) {
                             unpivotedData.push({

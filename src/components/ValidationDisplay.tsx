@@ -1,17 +1,12 @@
 import type { ReactNode } from "react";
 import type { ValidationResult } from "../utils/types.ts";
 
-interface ValidationDisplayProps {
-    validation: ValidationResult;
-}
-
 export default function ValidationDisplay(
-    { validation }: ValidationDisplayProps,
+    { validation }: { validation: ValidationResult },
 ): ReactNode {
     if (validation.errors.length === 0 && validation.warnings.length === 0) {
         return null;
     }
-
     return (
         <>
             {validation.errors.length > 0 && (

@@ -24,26 +24,6 @@ export default function DataPreview(
         ? Object.keys(currentSheetData[0]).filter((key) => key !== "sheet")
         : [];
 
-    const totalRecordsPivot = Array.from(rawData.values()).reduce(
-        (total, data) => total + data.length,
-        0,
-    );
-
-    // Calculate total unpivoted records
-    const totalRecordsUnpivot = Array.from(rawData.entries()).reduce(
-        (total, [_, sheetData]) => {
-            return total + sheetData.reduce((sheetTotal, row) => {
-                const validMonthValues = monthColumns.filter(
-                    (month) =>
-                        typeof row[month] === "number" &&
-                        !isNaN(row[month] as number),
-                ).length;
-                return sheetTotal + validMonthValues;
-            }, 0);
-        },
-        0,
-    );
-
     return (
         <div className="dataPreview">
             <div className="sheetSelector">
@@ -84,27 +64,6 @@ export default function DataPreview(
                     return String(value);
                 }}
             />
-
-            <div className="dataSummary">
-                <h4>Resumo dos Dados:</h4>
-                <ul>
-                    <li>
-                        <strong>Total de planilhas:</strong> {rawData.size}
-                    </li>
-                    <li>
-                        <strong>Total de registros (pivot):</strong>{" "}
-                        {totalRecordsPivot}
-                    </li>
-                    <li>
-                        <strong>Total de registros (unpivot):</strong>{" "}
-                        {totalRecordsUnpivot}
-                    </li>
-                    <li>
-                        <strong>Colunas de mês detectadas:</strong>{" "}
-                        {monthColumns.length}
-                    </li>
-                </ul>
-            </div>
         </div>
     );
 }

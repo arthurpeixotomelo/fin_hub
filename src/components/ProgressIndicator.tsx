@@ -1,24 +1,12 @@
 import type { ReactNode } from "react";
-
-interface ProcessingState {
-    status: "idle" | "processing" | "validated" | "error" | "ready";
-    progress: number;
-    message: string;
-    stage?: string;
-    currentSheet?: string;
-}
-
-interface ProgressIndicatorProps {
-    processing: ProcessingState;
-}
+import type { ProcessingState } from '../utils/types'
 
 export default function ProgressIndicator(
-    { processing }: ProgressIndicatorProps,
+    { processing }: { processing: ProcessingState},
 ): ReactNode {
     if (processing.status === "idle") {
         return null;
     }
-
     return (
         <div className="processingSection">
             <div className="progressBar">
