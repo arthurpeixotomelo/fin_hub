@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
+import Worker from "../workers/fileProcessor.worker.ts?worker";
 import { validateFileType } from "../utils/validation.ts";
 import type {
     FileProcessingHookResult,
@@ -37,10 +38,7 @@ export default function useFileProcessing(): FileProcessingHookResult {
     const workerRef = useRef<Worker | null>(null);
 
     useEffect(() => {
-        workerRef.current = new Worker(
-            new URL("../workers/fileProcessor.worker.ts", import.meta.url),
-            { type: "module" },
-        );
+        workerRef.current = new Worker();
 
         if (workerRef.current) {
             workerRef.current.onmessage = (

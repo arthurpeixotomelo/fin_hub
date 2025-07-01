@@ -1,51 +1,76 @@
 import type { ReactNode } from "react";
+import { formatFileSize } from "../utils/validation.ts";
 import useFileProcessing from "../hooks/useFileProcessing.ts";
-import FileInputSection from "./FileInputSection.tsx";
-import ProgressIndicator from "./ProgressIndicator.tsx";
-import ValidationDisplay from "./ValidationDisplay.tsx";
-import DataPreview from "./DataPreview.tsx";
-import ActionButtons from "./ActionButtons.tsx";
 import "../styles/FileUpload.css";
 
 export default function FileUpload(): ReactNode {
     const {
         file,
-        rawData,
-        unpivotedData: _unpivotedData,
-        monthColumns,
-        validation,
         processing,
+        validation,
         fileInputRef,
         handleFileChange,
         handleSubmit,
         resetForm,
     } = useFileProcessing();
-
+    
+    const isFileSelected = file !== null;
+    const isProcessing = processing.status === "processing";
+    const isFileValid = validation.isValid && processing.status === "validated"
+    
     return (
-        <div className="fileUploadContainer">
-            <FileInputSection
-                file={file}
-                onFileChange={handleFileChange}
-                processing={processing}
-                fileInputRef={fileInputRef}
-            />
-
-            <ProgressIndicator processing={processing} />
-
-            <ValidationDisplay validation={validation} />
-
-            <DataPreview
-                rawData={rawData}
-                monthColumns={monthColumns}
-            />
-
-            <ActionButtons
-                validation={validation}
-                processing={processing}
-                file={file}
-                onSubmit={handleSubmit}
-                onReset={resetForm}
-            />
-        </div>
+        <section>
+            <label htmlFor="fileInput">
+                <input
+                    id="fileInput"
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx"
+                    onChange={handleFileChange}
+                    disabled={isFileSelected}
+                    required
+                />
+                {file ? (
+                    <div className="content">
+                        <p>
+                            <span>
+                                <strong>Arquivo: </strong>
+                                {file.name}
+                            </span>
+                            <br/>
+                            <span>
+                                <strong>Tamanho: </strong>
+                                {formatFileSize(file.size)}
+                            </span>
+                        </p>
+                    </div>
+                ) : (
+                    <div className="content">
+                        <p>
+                            Arraste e solte um arquivo excel ou clique para
+                            selecionar
+                        </p>
+                    </div>
+                )}
+            </label>
+            <div className={`actions ${isFileSelected ? "" : "disabled"}`}>
+                <button
+                    type="button"
+                    onClick={handleSubmit}
+                    className="btnSubmit"
+                    disabled={!isFileValid}
+                >
+                    Enviar
+                </button>
+                <button
+                    type="button"
+                    onClick={resetForm}
+                    className="btnReset"
+                    disabled={!isProcessing}
+                >
+                    Cancelar
+                </button>
+            </div>
+        </section>
     );
 }
