@@ -34,7 +34,7 @@ section {
             position: absolute;
 
             &:user-invalid {
-                animation: :global(shake) 0.3s ease-in-out;
+                animation: shake 0.3s ease-in-out;
                 border: 2px solid red;
             }
 
@@ -65,4 +65,40 @@ section {
             cursor: pointer;
         }
     }
+}
+
+.processingSection {
+    margin: 2rem 0;
+}
+
+.progressBar {
+    width: 100%;
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progressFill {
+    height: 100%;
+    background: #007bff;
+    transition: width 0.3s ease;
+}
+
+.processingInfo {
+    margin-top: 1rem;
+}
+
+.processingStage {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin: 0.25rem 0;
+}
+
+.processingProgress {
+    font-size: 0.875rem;
+    color: #007bff;
+    font-weight: 600;
+    margin: 0.25rem 0;
 }

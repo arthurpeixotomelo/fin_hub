@@ -1,10 +1,9 @@
-import type { ReactNode } from "react";
-import type { ProcessingState } from '../utils/types'
+import { useContext, type ReactNode } from "react";
+import { UploadContext } from "../context/UploadContext";
 
-export default function ProgressIndicator(
-    { processing }: { processing: ProcessingState},
-): ReactNode {
-    if (processing.status === "idle") {
+export default function ProgressIndicator(): ReactNode {
+    const { state } = useContext(UploadContext);
+    if (state.status === "idle") {
         return null;
     }
     return (
@@ -12,22 +11,20 @@ export default function ProgressIndicator(
             <div className="progressBar">
                 <div
                     className="progressFill"
-                    style={{ width: `${processing.progress}%` }}
+                    style={{ width: `${state.progress}%` }}
                 />
             </div>
             <div className="processingInfo">
-                <p className="processingMessage">
-                    {processing.message}
-                </p>
-                {processing.stage && (
+                {/* <p className="processingMessage">
+                    {state.message}
+                </p> */}
+                {state.status && (
                     <p className="processingStage">
-                        Etapa: {processing.stage}
-                        {processing.currentSheet &&
-                            ` (${processing.currentSheet})`}
+                        Etapa: {state.status}
                     </p>
                 )}
                 <p className="processingProgress">
-                    {processing.progress}% concluído
+                    {state.progress}% concluído
                 </p>
             </div>
         </div>
