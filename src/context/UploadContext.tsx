@@ -1,31 +1,30 @@
-import { createContext, useContext, use, useReducer, useRef } from 'react';
-import type { Dispatch, ReactNode, MutableRefObject } from 'react';
+import { createContext, useContext, useReducer, useRef } from 'react';
+import type { Dispatch, ReactNode, RefObject } from 'react';
 import type { FinancialData } from '../utils/types';
 
-type UploadStatus = 'idle' | 'processing' | 'uploading' | 'validating' | 'done' | 'error' | 'aborted';
+type UploadStatus = 'idle' | 'uploading' | 'reading' | 'processing' | 'validating' | 'done' | 'error';
 
 interface UploadState {
   progress: number;
   status: UploadStatus;
   error: string | null;
-  aborted: boolean;
   file: File | null;
+  jobId: string | null;
 }
 
 type UploadAction =
-  | { type: 'START'; payload: File }
-  | { type: 'PROGRESS'; payload: number }
-  | { type: 'ABORT' }
+  | { type: 'START'; payload: { file: File; jobId: string } }
+  | { type: 'PROGRESS'; payload: { progress: number; status: UploadStatus } }
   | { type: 'ERROR'; payload: string }
-  | { type: 'DONE' }
+  | { type: 'DONE'; payload: { progress: number; status: 'done' } }
   | { type: 'RESET' };
 
 const initialState: UploadState = {
   progress: 0,
   status: 'idle',
   error: null,
-  aborted: false,
   file: null,
+  jobId: null
 };
 
 function uploadReducer(state: UploadState, action: UploadAction): UploadState {
@@ -33,20 +32,15 @@ function uploadReducer(state: UploadState, action: UploadAction): UploadState {
     case 'START':
       return {
         ...state,
-        status: 'uploading',
-        progress: 0,
-        error: null,
-        aborted: false,
-        file: action.payload,
+        file: action.payload.file,
+        jobId: action.payload.jobId,
       };
     case 'PROGRESS':
-      return { ...state, progress: action.payload };
-    case 'ABORT':
-      return { ...state, status: 'aborted', aborted: true };
+      return { ...state, progress: action.payload.progress, status: action.payload.status };
     case 'ERROR':
       return { ...state, status: 'error', error: action.payload };
     case 'DONE':
-      return { ...state, status: 'done', progress: 100 };
+      return { ...state, progress: action.payload.progress, status: action.payload.status };
     case 'RESET':
       return initialState;
     default:
@@ -54,14 +48,18 @@ function uploadReducer(state: UploadState, action: UploadAction): UploadState {
   }
 }
 
-export const UploadContext = createContext<
-  [UploadState, Dispatch<UploadAction>, MutableRefObject<Record<string, FinancialData[]> | null>] | null
->(null);
+interface UploadContextType {
+  state: UploadState;
+  dispatch: Dispatch<UploadAction>;
+  dataRef: RefObject<Record<string, FinancialData[]> | null>;
+}
+
+export const UploadContext = createContext<UploadContextType | null>(null);
 
 export function useUploadContext() {
     const context = useContext(UploadContext);
     if (!context) {
-    throw new Error('UploadContext must be used within an UploadProvider');
+      throw new Error('UploadContext must be used within an UploadProvider');
     }
     return context;
 }

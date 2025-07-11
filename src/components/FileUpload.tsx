@@ -1,5 +1,6 @@
 
 import FileInput from './FileInput';
+import type { ReactNode } from 'react';
 import ProgressIndicator from './ProgressIndicator';
 import { UploadProvider } from '../context/UploadContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

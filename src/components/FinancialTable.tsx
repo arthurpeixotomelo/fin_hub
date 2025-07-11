@@ -12,7 +12,7 @@ import {
     type SortingState,
     useReactTable,
 } from "@tanstack/react-table";
-import type { FinancialData } from "../utils/types.ts";
+import type { FinancialData } from "../utils/types";
 import {
     calculatePeriodChange,
     calculateYoY,
@@ -20,8 +20,8 @@ import {
     getSortedMonths,
     type GroupingPeriod,
     groupMonthsByPeriod,
-} from "../utils/dateGrouping.ts";
-import { getDefaultDateConfig } from "../utils/validation.ts";
+} from "../utils/dateGrouping";
+import { getDefaultDateConfig } from "../utils/validation";
 import styles from "../styles/FinancialTable.module.css";
 
 interface FinancialTableProps {

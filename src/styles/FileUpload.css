@@ -4,7 +4,7 @@
     75% { transform: translateX(5px); }
 }
 
-section {
+section:not(:has(label progress)) {
     display: flex;
     margin: 1.5rem;
     border-radius: 1rem;
@@ -67,9 +67,25 @@ section {
     }
 }
 
-.processingSection {
-    margin: 2rem 0;
-}
+
+section:has(label progress) {
+    margin: 1.5rem;
+    & label {
+        display: flex;
+        flex-direction: column;
+        & progress {
+            width: 100%;
+            color-scheme: light dark;
+            accent-color: #007bff;
+            position: relative;
+            overflow: hidden;
+            transition: all 1.5s ease-out;
+            &[value]::-webkit-progress-value, &::-webkit-progress-value {
+                transition: all 2s ease-out;
+            }
+        }
+    }
+}   
 
 .progressBar {
     width: 100%;
@@ -82,8 +98,6 @@ section {
 
 .progressFill {
     height: 100%;
-    background: #007bff;
-    transition: width 0.3s ease;
 }
 
 .processingInfo {
