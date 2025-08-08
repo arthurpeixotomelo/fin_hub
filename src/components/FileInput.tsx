@@ -8,16 +8,15 @@ export default function FileInput(): ReactNode {
   const { state, dispatch, dataRef } = useUploadContext();
   const file = state.file;
   const isFileSelected = !!file;
-  const canSubmit = state.status === "done";
   const isProcessing = state.status !== "idle" || state.status !== "done";
 
-  useUploadProgress(state.jobId, isProcessing)
+  useUploadProgress(state.jobId, isProcessing);
 
   const uploadMutation = useMutation({
-    mutationFn: async ({ file, jobId }: { file: File, jobId: string }) => {
+    mutationFn: async ({ file, jobId }: { file: File; jobId: string }) => {
       const form = new FormData();
       form.append("file", file);
-      form.append("jobId", jobId)
+      form.append("jobId", jobId);
       const res = await fetch("/api/upload", {
         method: "POST",
         body: form,
@@ -51,14 +50,8 @@ export default function FileInput(): ReactNode {
       return;
     }
     const jobId = crypto.randomUUID();
-    dispatch({ type: 'START', payload: { file: selected, jobId } })
+    dispatch({ type: "START", payload: { file: selected, jobId } });
     uploadMutation.mutate({ file: selected, jobId: jobId });
-  };
-
-  const handleSubmit = () => {};
-
-  const resetForm = () => {
-    dispatch({ type: "RESET" });
   };
 
   return (
@@ -96,24 +89,6 @@ export default function FileInput(): ReactNode {
             </div>
           )}
       </label>
-      <div className={`actions ${isFileSelected ? "" : "disabled"}`}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          className="btnSubmit"
-          disabled={canSubmit}
-        >
-          Enviar
-        </button>
-        <button
-          type="button"
-          onClick={resetForm}
-          className="btnReset"
-          disabled={!isProcessing}
-        >
-          Cancelar
-        </button>
-      </div>
     </section>
   );
 }

@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { useRef } from "react";
 import { useUploadContext } from "../context/UploadContext";
 
 export default function ProgressIndicator(): ReactNode {
@@ -7,6 +6,7 @@ export default function ProgressIndicator(): ReactNode {
     const value = state.progress || 0;
     const isProcessing = state.status !== "idle" && state.status !== "done";
     if (dataRef.current) {console.log(dataRef.current);}
+    if (state.status === "idle") return null;
     return (
         <section id='upload-progress' aria-busy={isProcessing}>
             <label>

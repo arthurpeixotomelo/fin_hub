@@ -5,6 +5,8 @@ import ProgressIndicator from './ProgressIndicator';
 import { UploadProvider } from '../context/UploadContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '../styles/FileUpload.css';
+import FileUploadActions from './FileUploadActions';
+import SimpleDataTable from './SimpleDataTable';
 
 const queryClient = new QueryClient();
 
@@ -13,7 +15,9 @@ export default function FileUpload(): ReactNode {
         <QueryClientProvider client={queryClient}>
             <UploadProvider>
                 <FileInput />
-                <ProgressIndicator />    
+                <ProgressIndicator />
+                <SimpleDataTable />
+                <FileUploadActions />
             </UploadProvider>
         </QueryClientProvider>
     );
