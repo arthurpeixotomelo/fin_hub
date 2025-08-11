@@ -1,2 +1,10 @@
+onlyBuiltDependencies:
+  - core-js
+  - keccak
+  - scrypt
+  - secp256k1
+  - sha3
+  - websocket
+
 patchedDependencies:
   exceljs: patches/exceljs.patch

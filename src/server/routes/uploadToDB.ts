@@ -10,12 +10,12 @@ const uploadToDB = new Hono();
 
 uploadToDB.post("/", async (ctx) => {
     try {
-        const { fileData } = await ctx.req.json();
-        if (!fileData) {
-            return ctx.json({ error: "Missing fileData" }, 400);
+        const formData = await ctx.req.formData();
+        const file = formData.get("file") as File;
+        if (!file) {
+            return ctx.json({ error: "Missing file" }, 400);
         }
-
-        const fileBuffer = Buffer.from(fileData, "base64");
+        const fileBuffer = Buffer.from(await file.arrayBuffer());
         let handle: number | null = null;
         try {
             const createRes = await databricksAPI({
@@ -31,7 +31,7 @@ uploadToDB.post("/", async (ctx) => {
 
             for (
                 let offset = 0;
-                offset < fileBuffer.length;
+                offset < fileBuffer.byteLength;
                 offset += CHUNK_SIZE
             ) {
                 const chunk = fileBuffer.subarray(offset, offset + CHUNK_SIZE);

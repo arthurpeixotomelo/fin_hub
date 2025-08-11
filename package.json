@@ -3,20 +3,21 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "astro": "astro",
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/node": "^9.3.0",
     "@astrojs/react": "^4.3.0",
+    "@libsql/client": "^0.15.10",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-table": "^8.21.3",
     "astro": "^5.11.0",
+    "drizzle": "^1.4.0",
     "exceljs": "^4.4.0",
     "hono": "^4.8.4",
-    "nodejs-polars": "^0.18.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "remeda": "^2.24.0"
