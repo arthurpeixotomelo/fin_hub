@@ -4,6 +4,7 @@ import { Buffer } from "node:buffer";
 import { Readable } from "node:stream";
 import type { FinancialData } from '../utils/types';
 import { zip, fromEntries, merge } from 'remeda'
+import { writeTeamParquet } from "../db/index";
 
 const REQUIRED_SHEETS = [
   "RESULTADO",
@@ -12,6 +13,8 @@ const REQUIRED_SHEETS = [
   "SALDO_MEDIO",
   "SALDO_PONTA",
 ] as const;
+
+// await writeTeamParquet({ teamId, sheet: sheetObj.sheet, headers, rows: sheetData });
 
 const upload = new Hono();
 

@@ -3,11 +3,13 @@ import { formatFileSize } from "../utils/validation";
 import { useMutation } from "@tanstack/react-query";
 import { useUploadProgress } from "../hooks/useUploadProgress";
 import { useUploadContext } from "../context/UploadContext";
+import FileUploadActions from "./FileUploadActions";
 
 export default function FileInput(): ReactNode {
   const { state, dispatch, dataRef } = useUploadContext();
   const file = state.file;
   const isFileSelected = !!file;
+  const canSubmit = state.status === "done";
   const isProcessing = state.status !== "idle" || state.status !== "done";
 
   useUploadProgress(state.jobId, isProcessing);
